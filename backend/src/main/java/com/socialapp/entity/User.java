@@ -75,11 +75,11 @@ public class User {
 
     // Denormalized counters - same rationale as Post.likeCount/commentCount:
     // avoids COUNT() queries every time a profile is viewed.
-    @Column(name = "follower_count", nullable = false)
+  @Column(name = "follower_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     @Builder.Default
     private long followerCount = 0;
 
-    @Column(name = "following_count", nullable = false)
+  @Column(name = "following_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     @Builder.Default
     private long followingCount = 0;
 
