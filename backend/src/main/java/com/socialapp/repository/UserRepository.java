@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -27,6 +28,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
            "OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<User> searchByUsernameOrFullName(@Param("keyword") String keyword, Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.lastActiveAt = :now WHERE u.username = :username")
+    void updateLastActiveAt(@Param("username") String username, @Param("now") LocalDateTime now);
 
     @Modifying
     @Transactional

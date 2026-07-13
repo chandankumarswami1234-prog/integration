@@ -1,6 +1,6 @@
-# Social Media Backend — Phase 1+2+3: Foundation, Auth, Posts/Feed, Social Features
+# Social Media Backend — Phase 1+2+3+4: Foundation, Auth, Posts/Feed, Social Features, Messaging
 
-Spring Boot 3 / Java 21 backend, with JWT auth, Posts/Feed/Comments/Likes, and Follow/Block/Mute/Search, Dockerized for local dev, deployed on Render.
+Spring Boot 3 / Java 21 backend, with JWT auth, Posts/Feed/Comments/Likes, Follow/Block/Mute/Search, and private messaging, Dockerized for local dev, deployed on Render.
 
 ## What's included
 
@@ -29,14 +29,26 @@ Spring Boot 3 / Java 21 backend, with JWT auth, Posts/Feed/Comments/Likes, and F
 - `GET /api/users/{username}/followers` / `/following` — paginated lists
 - `POST /api/users/{username}/block` / `DELETE /api/users/{username}/block` — bidirectional: hides content both ways, severs any existing follow
 - `POST /api/users/{username}/mute` / `DELETE /api/users/{username}/mute` — one-directional, only affects your own feed
-- `GET /api/users/{username}` — profile view (follower/following counts, whether you follow them)
+- `GET /api/users/{username}` — profile view (follower/following counts, whether you follow them, online status)
 - `GET /api/users/search?q=keyword` — search by username or full name
+
+**Phase 4 — Messaging**
+- `POST /api/messages` — send a private message (`recipientUsername`, `content` and/or `attachmentUrl`+`attachmentType`)
+- `GET /api/messages/conversations` — inbox: one row per conversation, with last message + unread count
+- `GET /api/messages/conversation/{username}` — full message history with a specific user (paginated)
+- `PUT /api/messages/conversation/{username}/read` — mark a conversation as read
+- `DELETE /api/messages/{messageId}` — delete for yourself only ("delete for me," doesn't affect the other person's copy)
+- `POST /api/messages/{messageId}/react` / `DELETE /api/messages/{messageId}/react` — emoji reactions (one per user per message, replaceable)
+
+Messaging respects blocks (blocked users can't message each other) and includes a lightweight online-status approximation (`lastActiveAt`, updated on every authenticated request; "online" = active in the last 5 minutes).
+
+**Deliberately not built in this phase:** typing indicators and true real-time delivery. Both need a persistent connection (WebSocket), which is architecturally distinct from the REST API here — polling for "is this person typing right now" isn't practical. This is flagged as a separate future piece rather than silently skipped.
 
 Blocked/muted authors are automatically excluded from feed, search, and hashtag results. A block (either direction) also makes that user's posts/profile return 404 rather than 403, to avoid confirming block status to the blocked party.
 
 All endpoints require a valid `Authorization: Bearer <accessToken>` header except `/api/auth/**` and `/api/health`.
 
-Not yet built (next phases): messaging, notifications, admin panel, mobile app.
+Not yet built (next phases): notifications, admin panel, mobile app.
 
 ## Run locally
 

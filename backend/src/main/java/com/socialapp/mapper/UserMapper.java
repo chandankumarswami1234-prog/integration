@@ -4,8 +4,12 @@ import com.socialapp.dto.UserDto;
 import com.socialapp.entity.User;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class UserMapper {
+
+    private static final int ONLINE_THRESHOLD_MINUTES = 5;
 
     public UserDto toDto(User user) {
         return toDto(user, false);
@@ -15,6 +19,9 @@ public class UserMapper {
         if (user == null) {
             return null;
         }
+        boolean online = user.getLastActiveAt() != null
+                && user.getLastActiveAt().isAfter(LocalDateTime.now().minusMinutes(ONLINE_THRESHOLD_MINUTES));
+
         return UserDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -30,6 +37,8 @@ public class UserMapper {
                 .followerCount(user.getFollowerCount())
                 .followingCount(user.getFollowingCount())
                 .followedByCurrentUser(followedByCurrentUser)
+                .online(online)
+                .lastActiveAt(user.getLastActiveAt())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

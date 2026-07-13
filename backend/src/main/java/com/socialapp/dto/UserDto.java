@@ -27,5 +27,7 @@ public class UserDto {
     private long followerCount;
     private long followingCount;
     private boolean followedByCurrentUser;
+    private boolean online;
+    private LocalDateTime lastActiveAt;
     private LocalDateTime createdAt;
 }

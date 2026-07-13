@@ -1,5 +1,6 @@
 package com.socialapp.security;
 
+import com.socialapp.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(
@@ -49,6 +52,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                             userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                    // Best-effort presence tracking, not the request's main purpose:
+                    // failure here must never break the actual request.
+                    try {
+                        userRepository.updateLastActiveAt(username, LocalDateTime.now());
+                    } catch (Exception ignored) {
+                        // Deliberately swallowed - presence tracking is non-critical.
+                    }
                 }
             }
         } catch (Exception ex) {

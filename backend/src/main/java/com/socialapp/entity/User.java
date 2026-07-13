@@ -73,13 +73,24 @@ public class User {
     @Builder.Default
     private boolean deactivated = false;
 
+    // Lightweight online-status approximation: updated on each authenticated
+    // request (see JwtAuthFilter). "Online" is inferred as "active in the last
+    // few minutes" rather than a true real-time presence signal, which would
+    // need a persistent connection (WebSocket) - a separate, later piece.
+    @Column(name = "last_active_at")
+    private LocalDateTime lastActiveAt;
+
     // Denormalized counters - same rationale as Post.likeCount/commentCount:
     // avoids COUNT() queries every time a profile is viewed.
-  @Column(name = "follower_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    // columnDefinition with a DEFAULT is required here (not just @Builder.Default,
+    // which is Java-side only): without a DB-level default, adding a NOT NULL column
+    // to a table that already has rows fails outright, since existing rows have no
+    // value to satisfy the constraint. This lets Postgres backfill existing rows with 0.
+    @Column(name = "follower_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     @Builder.Default
     private long followerCount = 0;
 
-  @Column(name = "following_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    @Column(name = "following_count", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     @Builder.Default
     private long followingCount = 0;
 
