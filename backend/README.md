@@ -1,6 +1,6 @@
-# Social Media Backend — Phase 1+2+3+4: Foundation, Auth, Posts/Feed, Social Features, Messaging
+# Social Media Backend — Phase 1+2+3+4+5: Foundation, Auth, Posts/Feed, Social Features, Messaging, Notifications
 
-Spring Boot 3 / Java 21 backend, with JWT auth, Posts/Feed/Comments/Likes, Follow/Block/Mute/Search, and private messaging, Dockerized for local dev, deployed on Render.
+Spring Boot 3 / Java 21 backend, with JWT auth, Posts/Feed/Comments/Likes, Follow/Block/Mute/Search, private messaging, and in-app notifications, Dockerized for local dev, deployed on Render.
 
 ## What's included
 
@@ -48,7 +48,14 @@ Blocked/muted authors are automatically excluded from feed, search, and hashtag 
 
 All endpoints require a valid `Authorization: Bearer <accessToken>` header except `/api/auth/**` and `/api/health`.
 
-Not yet built (next phases): notifications, admin panel, mobile app.
+**Phase 5 — Notifications**
+- `GET /api/notifications` — paginated, newest first
+- `GET /api/notifications/unread-count`
+- `PUT /api/notifications/{id}/read` / `PUT /api/notifications/read-all`
+- Auto-triggered on: like, comment, follow, message (never notifies you about your own actions)
+- Push delivery (Firebase Cloud Messaging) is stubbed pending real Firebase credentials — see `PushNotificationSender`/`NoOpPushNotificationSender` for the integration point and exact steps to wire it up for real.
+
+Not yet built (next phases): admin panel, mobile app.
 
 ## Run locally
 

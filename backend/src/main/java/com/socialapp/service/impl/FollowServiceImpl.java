@@ -10,6 +10,7 @@ import com.socialapp.repository.BlockRepository;
 import com.socialapp.repository.FollowRepository;
 import com.socialapp.repository.UserRepository;
 import com.socialapp.service.FollowService;
+import com.socialapp.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ public class FollowServiceImpl implements FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final BlockRepository blockRepository;
+    private final NotificationService notificationService;
     private final UserMapper userMapper;
 
     @Override
@@ -52,6 +54,8 @@ public class FollowServiceImpl implements FollowService {
             // for a repeat query by ID, ignoring the fresh row - the exact staleness bug
             // we hit (and fixed) in PostServiceImpl.likePost. Compute in Java instead.
             displayFollowerCount = displayFollowerCount + 1;
+            notificationService.notify(target, follower, com.socialapp.entity.Notification.NotificationType.FOLLOW,
+                    null, null, null);
         }
 
         UserDto dto = userMapper.toDto(target, true);

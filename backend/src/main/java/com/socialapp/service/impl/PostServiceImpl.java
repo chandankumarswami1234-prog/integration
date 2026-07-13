@@ -14,6 +14,7 @@ import com.socialapp.repository.LikeRepository;
 import com.socialapp.repository.MuteRepository;
 import com.socialapp.repository.PostRepository;
 import com.socialapp.repository.UserRepository;
+import com.socialapp.service.NotificationService;
 import com.socialapp.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,7 @@ public class PostServiceImpl implements PostService {
     private final FollowRepository followRepository;
     private final BlockRepository blockRepository;
     private final MuteRepository muteRepository;
+    private final NotificationService notificationService;
     private final PostMapper postMapper;
 
     @Override
@@ -191,6 +193,8 @@ public class PostServiceImpl implements PostService {
             // Setting it on the managed entity would also trigger a full-row dirty-check flush,
             // and risks overwriting the DB's real value with a stale in-memory one under concurrent likes.
             displayLikeCount = displayLikeCount + 1;
+            notificationService.notify(post.getAuthor(), user, com.socialapp.entity.Notification.NotificationType.LIKE,
+                    post.getId(), null, null);
         }
 
         PostDto dto = postMapper.toDto(post, true);

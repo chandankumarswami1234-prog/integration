@@ -16,6 +16,7 @@ import com.socialapp.repository.MessageReactionRepository;
 import com.socialapp.repository.MessageRepository;
 import com.socialapp.repository.UserRepository;
 import com.socialapp.service.MessageService;
+import com.socialapp.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,6 +40,7 @@ public class MessageServiceImpl implements MessageService {
     private final MessageReactionRepository messageReactionRepository;
     private final UserRepository userRepository;
     private final BlockRepository blockRepository;
+    private final NotificationService notificationService;
     private final MessageMapper messageMapper;
     private final UserMapper userMapper;
 
@@ -69,6 +71,8 @@ public class MessageServiceImpl implements MessageService {
                 .build();
 
         message = messageRepository.save(message);
+        notificationService.notify(recipient, sender, com.socialapp.entity.Notification.NotificationType.MESSAGE,
+                null, null, message.getId());
         return messageMapper.toDto(message, sender.getId());
     }
 

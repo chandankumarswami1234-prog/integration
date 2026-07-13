@@ -12,6 +12,7 @@ import com.socialapp.repository.CommentRepository;
 import com.socialapp.repository.PostRepository;
 import com.socialapp.repository.UserRepository;
 import com.socialapp.service.CommentService;
+import com.socialapp.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
     private final CommentMapper commentMapper;
 
     @Override
@@ -54,6 +56,8 @@ public class CommentServiceImpl implements CommentService {
 
         comment = commentRepository.save(comment);
         postRepository.incrementCommentCount(postId);
+        notificationService.notify(post.getAuthor(), author, com.socialapp.entity.Notification.NotificationType.COMMENT,
+                post.getId(), comment.getId(), null);
 
         return commentMapper.toDto(comment);
     }
